@@ -42,7 +42,6 @@ const STATS = [
 
 const CURRENCIES = ['USD','EUR','GBP','CHF','JPY','CAD','AUD','SGD','AED','HKD'];
 
-// Carousel images (replace with your actual image URLs)
 const CAROUSEL_IMAGES = [
   {
     id: 1,
@@ -70,7 +69,6 @@ const CAROUSEL_IMAGES = [
   }
 ];
 
-// Partners/Brands section
 const PARTNERS = [
   { name: 'VISA', logo: '💳' },
   { name: 'Mastercard', logo: '💎' },
@@ -123,7 +121,6 @@ function CountUp({ target, duration = 2000, start }) {
   return <span>{display || (String(target).match(/^[^0-9]*/)?.[0] || '') + '0'}</span>;
 }
 
-// Image Carousel Component
 function ImageCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -191,6 +188,8 @@ function ImageCarousel() {
 export default function Landing() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const statsRef = useRef();
   const statsVisible = useInView(statsRef);
   
@@ -200,14 +199,35 @@ export default function Landing() {
   const aboutRef = useRef(null);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
     const onScroll = () => setScrolled(window.scrollY > 50);
+    
+    window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
+
+  // Close mobile menu when clicking a link
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [featuresRef, complianceRef, securityRef, aboutRef]);
 
   const scrollToSection = (ref) => {
     if (ref && ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setMobileMenuOpen(false);
     }
   };
 
@@ -225,6 +245,7 @@ export default function Landing() {
             </div>
           </div>
 
+          {/* Desktop Navigation */}
           <div className="land-nav-links">
             <button className="land-nav-link" onClick={() => scrollToSection(featuresRef)}>Features</button>
             <button className="land-nav-link" onClick={() => scrollToSection(complianceRef)}>Compliance</button>
@@ -235,9 +256,37 @@ export default function Landing() {
           <div className="land-nav-actions">
             <button className="land-btn-ghost" onClick={() => navigate('/login')}>Sign In</button>
             <button className="land-btn-gold" onClick={() => navigate('/register')}>Open Account</button>
+            
+            {/* Hamburger Menu Button - Mobile Only */}
+            <button 
+              className="land-hamburger"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? '✕' : '☰'}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <div className={`land-mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+          <button className="land-mobile-nav-link" onClick={() => scrollToSection(featuresRef)}>Features</button>
+          <button className="land-mobile-nav-link" onClick={() => scrollToSection(complianceRef)}>Compliance</button>
+          <button className="land-mobile-nav-link" onClick={() => scrollToSection(securityRef)}>Security</button>
+          <button className="land-mobile-nav-link" onClick={() => scrollToSection(aboutRef)}>About</button>
+          <div className="land-mobile-divider" />
+          <button className="land-mobile-btn-ghost" onClick={() => navigate('/login')}>Sign In</button>
+          <button className="land-mobile-btn-gold" onClick={() => navigate('/register')}>Open Account</button>
+        </div>
       </nav>
+
+      {/* Overlay for mobile menu */}
+      {mobileMenuOpen && isMobile && (
+        <div 
+          className="land-mobile-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       {/* ── CURRENCY TICKER ── */}
       <div className="land-ticker">
@@ -357,6 +406,7 @@ export default function Landing() {
         <ImageCarousel />
       </section>
 
+      {/* Rest of your sections remain the same... */}
       {/* ── FEATURES ── */}
       <section ref={featuresRef} className="land-section">
         <AnimSection>
