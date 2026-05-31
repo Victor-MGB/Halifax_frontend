@@ -1,0 +1,673 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ── TOKENS ───────────────────────────────────────────────── */
+:root {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:  'DM Mono', monospace;
+  --font-sans:  'Outfit', sans-serif;
+}
+
+/* ── ANIMATIONS ──────────────────────────────────────────── */
+@keyframes fadeUp     { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+@keyframes shimmer    { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+@keyframes pulse      { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+@keyframes float      { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-14px); } }
+@keyframes floatBadge { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-8px) rotate(-2deg); } }
+@keyframes ticker     { from { transform:translateX(0); } to { transform:translateX(-33.33%); } }
+@keyframes borderGlow { 0%,100% { box-shadow:0 0 20px rgba(200,168,74,0.1); } 50% { box-shadow:0 0 40px rgba(200,168,74,0.28); } }
+
+.pulse      { animation: pulse 2s ease-in-out infinite; }
+.float-card { animation: float 6s ease-in-out infinite; }
+.float-badge{ animation: floatBadge 5s 1s ease-in-out infinite; }
+
+.shimmer-gold {
+  background: linear-gradient(90deg, #C8A84A 0%, #F5E0A0 30%, #C8A84A 55%, #E8C870 80%, #C8A84A 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* scroll-triggered sections */
+.anim-section { opacity:0; transform:translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.anim-visible  { opacity:1; transform:translateY(0); }
+
+/* fade-up utility (hero only — no IntersectionObserver needed) */
+.fade-up-1 { animation: fadeUp 0.8s 0.1s ease both; }
+.fade-up-2 { animation: fadeUp 0.8s 0.25s ease both; }
+.fade-up-3 { animation: fadeUp 0.8s 0.4s ease both; }
+.fade-up-4 { animation: fadeUp 0.8s 0.55s ease both; }
+
+/* ── ROOT ─────────────────────────────────────────────────── */
+.land-root {
+  background: #04060A;
+  color: #C8D8E8;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+.land-root ::-webkit-scrollbar       { width: 3px; }
+.land-root ::-webkit-scrollbar-track { background: #04060A; }
+.land-root ::-webkit-scrollbar-thumb { background: #223045; border-radius: 2px; }
+
+/* ── NAVBAR ───────────────────────────────────────────────── */
+.land-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 68px; display: flex; align-items: center;
+  transition: background 0.35s, border-bottom 0.35s, backdrop-filter 0.35s;
+}
+.land-nav-scrolled {
+  background: rgba(4,6,10,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid #182030;
+}
+.land-nav-inner {
+  max-width: 1160px; margin: 0 auto; width: 100%;
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.land-logo { display: flex; align-items: center; gap: 10px; }
+.land-logo-mark {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(135deg, #C8A84A, #E8C870);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-weight: 700; color: #04060A; font-size: 18px;
+}
+.land-logo-name {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 17px; letter-spacing: 3px; color: #C8D8E8;
+}
+.land-logo-sub {
+  font-family: var(--font-mono); font-size: 8px;
+  color: #C8A84A; letter-spacing: 2px; margin-top: 1px;
+}
+.land-nav-links { display: flex; gap: 30px; }
+.land-nav-link {
+  color: #4A6080; font-size: 13px; cursor: pointer;
+  background: none; border: none; font-family: var(--font-sans);
+  letter-spacing: 0.5px; transition: color 0.2s;
+}
+.land-nav-link:hover { color: #C8D8E8; }
+.land-nav-actions { display: flex; gap: 10px; align-items: center; }
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.land-btn-gold {
+  background: linear-gradient(135deg, #C8A84A, #E8C870);
+  color: #04060A; border: none; border-radius: 10px;
+  padding: 12px 26px; font-family: var(--font-sans);
+  font-weight: 600; font-size: 12px; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.land-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(200,168,74,0.35);
+}
+.land-btn-ghost {
+  background: transparent; color: #C8D8E8;
+  border: 1px solid #223045; border-radius: 10px;
+  padding: 11px 24px; font-family: var(--font-sans);
+  font-size: 12px; letter-spacing: 1px; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.land-btn-ghost:hover { border-color: #C8A84A; color: #C8A84A; }
+.land-btn-lg { padding: 15px 38px; font-size: 13px; }
+
+/* ── TICKER ───────────────────────────────────────────────── */
+.land-ticker {
+  position: fixed; top: 68px; left: 0; right: 0; z-index: 199;
+  background: #070A0F; border-bottom: 1px solid #182030;
+  padding: 8px 0; overflow: hidden; white-space: nowrap;
+}
+.land-ticker-track {
+  display: inline-flex; gap: 56px;
+  animation: ticker 22s linear infinite;
+}
+.land-ticker-item {
+  font-family: var(--font-mono); font-size: 11px;
+  color: #4A6080; letter-spacing: 1.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.land-ticker-dot {
+  display: inline-block; width: 5px; height: 5px;
+  border-radius: 50%; background: #C8A84A; opacity: 0.5;
+}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.land-hero {
+  min-height: 100vh;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 60px;
+  padding: 160px 80px 100px;
+  max-width: 1200px; margin: 0 auto;
+  position: relative;
+}
+.land-hero-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.land-hero-glow {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,168,74,0.06), transparent 65%);
+}
+.land-hero-glow-1 { top: 5%;  left: 20%; width: 700px; height: 700px; }
+.land-hero-glow-2 { top: 20%; right:-10%; width: 500px; height: 500px; background: radial-gradient(circle,rgba(62,207,207,0.04),transparent 65%); }
+.land-hero-glow-3 { bottom:5%;left:-5%;  width: 400px; height: 400px; background: radial-gradient(circle,rgba(167,139,250,0.03),transparent 65%); }
+.land-hero-grid {
+  position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.03;
+}
+.land-hero-content { position: relative; z-index: 1; }
+.land-hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(200,168,74,0.07); border: 1px solid rgba(200,168,74,0.2);
+  border-radius: 20px; padding: 6px 16px; margin-bottom: 28px;
+  font-family: var(--font-mono); font-size: 10px; color: #C8A84A; letter-spacing: 2px;
+}
+.land-badge-dot {
+  display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; background: #4ADE80;
+  box-shadow: 0 0 8px #4ADE8088;
+}
+.land-hero-h1 {
+  font-family: var(--font-serif); font-size: 72px;
+  font-weight: 300; line-height: 1.05; margin-bottom: 22px;
+  letter-spacing: -0.5px;
+}
+.land-hero-sub {
+  font-size: 16px; color: #4A6080; line-height: 1.85;
+  max-width: 480px; margin-bottom: 36px; font-weight: 300;
+}
+.land-hero-btns  { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+.land-hero-trust { display: flex; gap: 20px; flex-wrap: wrap; }
+.land-trust-item {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; color: #4A6080;
+}
+.land-trust-star { color: #C8A84A; font-size: 10px; }
+
+/* hero card */
+.land-card-header   { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.land-card-label    { font-family: var(--font-mono); font-size: 9px; color: #4A6080; letter-spacing: 2px; margin-bottom: 4px; }
+.land-card-balance  { font-family: var(--font-serif); font-size: 32px; font-weight: 400; color: #C8D8E8; }
+.land-card-status   { display: flex; align-items: center; gap: 6px; }
+.land-card-accounts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.land-mini-acc {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0F1520; border: 1px solid #182030; border-radius: 10px; padding: 12px 14px;
+}
+.land-card-secure {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15);
+  border-radius: 8px; padding: 10px 13px;
+  font-family: var(--font-mono); font-size: 10px; color: #4ADE80; letter-spacing: 1px;
+}
+.land-stage-badge {
+  position: absolute; top: -18px; right: -18px;
+  background: #070A0F; border: 1px solid rgba(200,168,74,0.3);
+  border-radius: 12px; padding: 10px 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.land-hero-card {
+  position: relative; z-index: 1;
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 20px; padding: 28px;
+  animation: borderGlow 4s ease-in-out infinite, float 6s ease-in-out infinite;
+}
+
+/* ── STATS ────────────────────────────────────────────────── */
+.land-stats {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border-top: 1px solid #182030; border-bottom: 1px solid #182030;
+  background: #070A0F;
+}
+.land-stat-item {
+  text-align: center; padding: 32px 20px;
+  border-right: 1px solid #182030;
+  animation: fadeUp 0.6s ease both;
+}
+.land-stat-item:last-child { border-right: none; }
+.land-stat-value {
+  font-family: var(--font-serif); font-size: 48px;
+  font-weight: 400; color: #E8C870; line-height: 1; margin-bottom: 8px;
+}
+.land-stat-label {
+  font-family: var(--font-mono); font-size: 10px;
+  color: #4A6080; letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* ── SECTION COMMONS ─────────────────────────────────────── */
+.land-section {
+  padding: 110px 40px;
+  max-width: 1120px; margin: 0 auto;
+}
+.land-section-header {
+  text-align: center; margin-bottom: 64px;
+}
+.land-eyebrow {
+  font-family: var(--font-mono); font-size: 10px;
+  color: #C8A84A; letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.land-h2 {
+  font-family: var(--font-serif); font-size: 52px;
+  font-weight: 300; line-height: 1.1; color: #C8D8E8;
+}
+.land-body-text {
+  font-size: 14px; color: #4A6080; line-height: 1.9; margin-bottom: 20px;
+}
+
+/* ── FEATURES ─────────────────────────────────────────────── */
+.land-features-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+}
+.land-feature-card {
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 18px; padding: 32px 28px;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.land-feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(200,168,74,0.25);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+}
+.land-feature-icon {
+  width: 46px; height: 46px; border-radius: 13px;
+  background: rgba(200,168,74,0.08); border: 1px solid rgba(200,168,74,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px; color: #C8A84A; margin-bottom: 20px;
+}
+.land-feature-title {
+  font-family: var(--font-serif); font-size: 22px;
+  font-weight: 500; margin-bottom: 10px; color: #C8D8E8;
+}
+.land-feature-desc { font-size: 13px; color: #4A6080; line-height: 1.8; }
+
+/* ── COMPLIANCE ───────────────────────────────────────────── */
+.land-compliance-section {
+  padding: 100px 40px;
+  background: #070A0F;
+  border-top: 1px solid #182030;
+  border-bottom: 1px solid #182030;
+}
+.land-compliance-inner {
+  max-width: 1060px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.land-compliance-text .land-h2 { font-size: 44px; margin-bottom: 18px; }
+.land-check-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.land-check-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #C8D8E8; }
+.land-check-star { color: #C8A84A; font-size: 12px; }
+
+/* stage list */
+.land-stage-list { display: flex; flex-direction: column; gap: 7px; }
+.land-stage-row {
+  display: flex; align-items: center; gap: 12px;
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 10px; padding: 11px 16px;
+  cursor: default; transition: background 0.2s, border-color 0.2s;
+}
+.land-stage-row:hover { background: rgba(200,168,74,0.04); border-color: rgba(200,168,74,0.18); }
+.stage-done   { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.18); }
+.stage-active { background: rgba(200,168,74,0.06); border-color: rgba(200,168,74,0.22); }
+.land-stage-num {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  background: #0F1520; border: 1px solid #223045;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; color: #4A6080;
+}
+.stage-done   .land-stage-num { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.25); color: #4ADE80; }
+.stage-active .land-stage-num { background: rgba(200,168,74,0.12); border-color: rgba(200,168,74,0.25); color: #C8A84A; }
+.land-stage-name { font-size: 12px; font-weight: 500; flex: 1; color: #C8D8E8; }
+.stage-done   .land-stage-name { color: #4ADE80; }
+.stage-active .land-stage-name { color: #E8C870; }
+.land-stage-badge-pill {
+  font-family: var(--font-mono); font-size: 10px; white-space: nowrap;
+  color: #4A6080; margin-left: auto;
+}
+.stage-done   .land-stage-badge-pill { color: #4ADE80; }
+.stage-active .land-stage-badge-pill { color: #FBBF24; }
+.land-stage-more {
+  display: flex; align-items: center; gap: 12px;
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 10px; padding: 10px 16px;
+}
+.land-stage-progress {
+  background: #182030; border-radius: 3px; height: 4px; overflow: hidden; margin-top: 10px;
+}
+.land-stage-progress-bar {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #C8A84A, #E8C870);
+  transition: width 0.6s ease;
+}
+
+/* ── HOW IT WORKS ─────────────────────────────────────────── */
+.land-steps-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 0;
+  position: relative;
+}
+.land-step-card {
+  padding: 0 36px; text-align: center; position: relative;
+}
+.land-step-num {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #070A0F; border: 1px solid #223045;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; position: relative; z-index: 1;
+  font-family: var(--font-serif); font-size: 28px; font-weight: 400; color: #C8A84A;
+}
+.land-step-connector {
+  position: absolute; top: 36px; left: calc(50% + 36px); right: calc(-50% + 36px);
+  height: 1px; background: linear-gradient(90deg, #223045, transparent);
+  z-index: 0;
+}
+.land-step-title {
+  font-family: var(--font-serif); font-size: 22px; font-weight: 500;
+  margin-bottom: 10px; color: #C8D8E8;
+}
+.land-step-desc { font-size: 13px; color: #4A6080; line-height: 1.8; }
+
+/* ── TESTIMONIALS ─────────────────────────────────────────── */
+.land-testimonials-section {
+  padding: 100px 40px;
+  background: #070A0F;
+  border-top: 1px solid #182030;
+  border-bottom: 1px solid #182030;
+}
+.land-testimonials-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  max-width: 1060px; margin: 0 auto;
+}
+.land-testimonial-card {
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 18px; padding: 28px;
+  transition: transform 0.25s, border-color 0.25s;
+}
+.land-testimonial-card:hover { transform: translateY(-4px); border-color: rgba(200,168,74,0.2); }
+.land-stars { color: #C8A84A; font-size: 13px; letter-spacing: 2px; margin-bottom: 16px; }
+.land-testimonial-text {
+  font-family: var(--font-serif); font-size: 17px; font-weight: 400;
+  line-height: 1.75; margin-bottom: 20px; font-style: italic; color: #C8D8E8;
+}
+.land-testimonial-author {
+  display: flex; align-items: center; gap: 10px;
+  padding-top: 16px; border-top: 1px solid #182030;
+}
+.land-author-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #182030, #223045);
+  border: 1px solid #223045;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: #C8A84A;
+}
+.land-author-name { font-size: 13px; font-weight: 500; }
+.land-author-role { font-size: 11px; color: #4A6080; margin-top: 1px; }
+
+/* ── SECURITY ─────────────────────────────────────────────── */
+.land-security-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.land-security-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px;
+}
+.land-security-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: #0A0E16; border: 1px solid #182030;
+  border-radius: 8px; font-size: 11px; color: #C8D8E8;
+}
+.land-check-green { color: #4ADE80; font-size: 12px; }
+
+.land-sec-card {
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 20px; padding: 28px; position: relative; overflow: hidden;
+  animation: borderGlow 4s ease-in-out infinite, float 6s ease-in-out infinite;
+}
+.land-sec-card-header {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;
+}
+.land-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #182030, #223045);
+  border: 1px solid #223045;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #C8A84A;
+}
+.land-sec-accounts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.land-sec-acc-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0F1520; border: 1px solid #182030; border-radius: 10px; padding: 12px 14px;
+}
+.land-encrypted-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15);
+  border-radius: 8px; padding: 10px 13px;
+  font-family: var(--font-mono); font-size: 10px; color: #4ADE80; letter-spacing: 1px;
+}
+
+/* ── CTA ──────────────────────────────────────────────────── */
+.land-cta-section {
+  padding: 120px 40px; text-align: center; position: relative; overflow: hidden;
+}
+.land-cta-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(200,168,74,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.land-cta-content { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+.land-cta-btns    { display: flex; gap: 14px; justify-content: center; margin-bottom: 20px; }
+.land-cta-footnote {
+  font-family: var(--font-mono); font-size: 10px; color: #4A6080;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+.land-footer {
+  border-top: 1px solid #182030; background: #070A0F;
+  padding: 56px 40px 32px;
+}
+.land-footer-inner  { max-width: 1120px; margin: 0 auto; }
+.land-footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 44px;
+}
+.land-footer-brand  { }
+.land-footer-desc   { font-size: 12px; color: #4A6080; line-height: 1.8; max-width: 260px; margin-top: 12px; }
+.land-footer-col-title {
+  font-family: var(--font-mono); font-size: 10px; color: #C8A84A;
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
+}
+.land-footer-link {
+  font-size: 12px; color: #4A6080; margin-bottom: 9px; cursor: pointer;
+  transition: color 0.2s;
+}
+.land-footer-link:hover { color: #C8D8E8; }
+.land-footer-bottom {
+  border-top: 1px solid #182030; padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.land-footer-currencies { display: flex; gap: 6px; flex-wrap: wrap; }
+.land-currency-pill {
+  font-family: var(--font-mono); font-size: 10px; color: #4A6080;
+  background: #0A0E16; border: 1px solid #182030;
+  border-radius: 4px; padding: 3px 8px;
+}
+
+
+/* Carousel Styles */
+.land-carousel-section {
+  padding: 80px 40px;
+  background: linear-gradient(180deg, transparent 0%, rgba(200,168,74,0.03) 100%);
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.carousel-slide {
+  position: relative;
+  aspect-ratio: 16/9;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.carousel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-content {
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+.carousel-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.carousel-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  font-size: 2rem;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-btn:hover {
+  background: rgba(200,168,74,0.8);
+}
+
+.carousel-btn-prev {
+  left: 20px;
+}
+
+.carousel-btn-next {
+  right: 20px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background: var(--gold);
+  width: 24px;
+  border-radius: 5px;
+}
+
+/* Partners Section */
+.land-partners-section {
+  padding: 60px 40px;
+  background: rgba(200,168,74,0.03);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.land-partners-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 48px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.land-partner-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.land-partner-item:hover {
+  opacity: 1;
+}
+
+.land-partner-icon {
+  font-size: 2rem;
+}
+
+.land-partner-name {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .land-carousel-section {
+    padding: 40px 20px;
+  }
+  
+  .carousel-title {
+    font-size: 1.5rem;
+  }
+  
+  .carousel-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .carousel-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+    padding: 8px 12px;
+  }
+  
+  .land-partners-grid {
+    gap: 24px;
+  }
+  
+  .land-partner-icon {
+    font-size: 1.5rem;
+  }
+}
