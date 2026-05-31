@@ -255,7 +255,7 @@ export default function Landing() {
 
           <div className="land-nav-actions">
             <button className="land-btn-ghost" onClick={() => navigate('/login')}>Sign In</button>
-            <button className="land-btn-gold" onClick={() => navigate('/register')}>Open Account</button>
+            <button className="land-btn-gold" onClick={() => navigate('/register')}>Register</button>
             
             {/* Hamburger Menu Button - Mobile Only */}
             <button 
@@ -276,7 +276,7 @@ export default function Landing() {
           <button className="land-mobile-nav-link" onClick={() => scrollToSection(aboutRef)}>About</button>
           <div className="land-mobile-divider" />
           <button className="land-mobile-btn-ghost" onClick={() => navigate('/login')}>Sign In</button>
-          <button className="land-mobile-btn-gold" onClick={() => navigate('/register')}>Open Account</button>
+          <button className="land-mobile-btn-gold" onClick={() => navigate('/register')}>Register</button>
         </div>
       </nav>
 
@@ -334,7 +334,7 @@ export default function Landing() {
 
           <div className="land-hero-btns fade-up-3">
             <button className="land-btn-gold land-btn-lg" onClick={() => navigate('/register')}>
-              Open Private Account
+              Register
             </button>
             <button className="land-btn-ghost land-btn-lg" onClick={() => navigate('/login')}>
               Sign In →
@@ -610,7 +610,7 @@ export default function Landing() {
           </p>
           <div className="land-cta-btns">
             <button className="land-btn-gold land-btn-lg" onClick={() => navigate('/register')}>
-              Open Your Account
+              Register
             </button>
             <button className="land-btn-ghost land-btn-lg" onClick={() => navigate('/login')}>
               Sign In

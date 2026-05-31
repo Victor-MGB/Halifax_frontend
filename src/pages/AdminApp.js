@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { api, fmt, fmtDate, fmtTime, CURRENCIES } from '../utils/api';
+import AdminMonitoring from './AdminMonitoring';  
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const PIE_COLORS = ['#C9A84C', '#3ECFCF', '#4ADE80', '#A78BFA', '#F87171', '#FBBF24', '#80DEEA'];
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'fund', label: 'Fund Users', icon: '💰' },
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'transactions', label: 'Transactions', icon: '📜' },
+  { id: 'monitoring', label: 'Monitoring', icon: '📡'}
 ];
 
 const StageStatusBadge = ({ status }) => {
@@ -809,9 +811,14 @@ export default function AdminApp() {
               )}
             </div>
           )}
+
+                    {tab === 'monitoring' && (
+            <div className="animate-in">
+              <AdminMonitoring />
+            </div>
+          )}
         </main>
       </div>
-
       {/* Stage Action Modal */}
       {activeStageAction && (
         <div style={{

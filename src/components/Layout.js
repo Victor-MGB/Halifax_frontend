@@ -55,9 +55,9 @@ export default function Layout() {
             background: 'linear-gradient(135deg, #C9A84C, #E8C97A)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 700, color: '#050709', fontSize: 16,
-          }}>N</div>
+          }}>HO</div>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 600 }}>NEXUS</p>
+            <p style={{ fontSize: 14, fontWeight: 600 }}>Halifax Offshore</p>
             <p style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: 1 }}>PRIVATE BANK</p>
           </div>
         </div>
@@ -115,9 +115,9 @@ export default function Layout() {
                 background: 'linear-gradient(135deg, #C9A84C, #E8C97A)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 700, color: '#050709', fontSize: 20,
-              }}>N</div>
+              }}>HO</div>
               <div>
-                <p style={{ fontWeight: 600, fontSize: 18, letterSpacing: 2, color: 'var(--text)' }}>NEXUS</p>
+                <p style={{ fontWeight: 600, fontSize: 18, letterSpacing: 2, color: 'var(--text)' }}>Halifax Offshore</p>
                 <p style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: 2 }}>PRIVATE BANK</p>
               </div>
             </div>

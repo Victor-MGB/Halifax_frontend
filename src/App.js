@@ -11,6 +11,7 @@ import Withdraw from './pages/Withdraw';
 import NotificationsPage from './pages/NotificationsPage';
 import AdminApp from './pages/AdminApp';
 import Layout from './components/Layout';
+import AdminMonitoring from './pages/AdminMonitoring';
 
 const Loader = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--void)', flexDirection: 'column', gap: 16 }}>
@@ -51,7 +52,10 @@ function AppRoutes() {
         <Route path="/history" element={<History />} />
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        
       </Route>
+
+      <Route path="/monitoring" element={<AdminMonitoring />} />
       
       {/* Admin route - only admin users */}
       <Route 

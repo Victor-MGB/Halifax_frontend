@@ -275,7 +275,7 @@ export default function Login() {
           color: 'var(--muted)', 
           marginTop: 20 
         }}>
-          New client? <Link to="/register" style={{ color: 'var(--gold)', textDecoration: 'none' }}>Open an account</Link>
+          New client? <Link to="/register" style={{ color: 'var(--gold)', textDecoration: 'none' }}>Register</Link>
         </p>
 
         <div style={{ 

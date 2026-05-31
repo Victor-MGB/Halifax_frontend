@@ -216,10 +216,10 @@ export default function Register() {
           }}>HO</div>
           <h1 style={{ 
             fontFamily: 'var(--font-serif)', 
-            fontWeight: 500, 
+            fontWeight: 200, 
             fontSize: isMobile ? 22 : 26, 
             marginBottom: 4 
-          }}>Open an Account</h1>
+          }}>Register</h1>
           <p style={{ color: 'var(--muted)', fontSize: 12 }}>Join Halifx Offshore Private Bank</p>
         </div>
 
