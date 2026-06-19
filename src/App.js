@@ -12,6 +12,9 @@ import NotificationsPage from './pages/NotificationsPage';
 import AdminApp from './pages/AdminApp';
 import Layout from './components/Layout';
 import AdminMonitoring from './pages/AdminMonitoring';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Contact from './pages/Contact';
 
 const Loader = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--void)', flexDirection: 'column', gap: 16 }}>
@@ -44,6 +47,11 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={!user ? <Login /> : <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />} />
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" replace />} />
+
+      {/* <Route path="/" element={<Landing />} /> */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/contact" element={<Contact />} />
       
       {/* Protected routes - wrap everything with Layout */}
       <Route element={<PrivateRoute><Layout /></PrivateRoute>}>

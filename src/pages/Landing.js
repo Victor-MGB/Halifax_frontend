@@ -646,11 +646,14 @@ export default function Landing() {
                     className="land-footer-link"
                     style={{ cursor: 'pointer' }}
                     onClick={() => {
-                      if (item === 'About') scrollToSection(aboutRef);
-                      else if (item === 'Security') scrollToSection(securityRef);
-                      else if (item === 'Dashboard' || item === 'Transfer' || item === 'Withdraw') navigate('/login');
-                      else navigate('/');
-                    }}
+                         if (item === 'About') scrollToSection(aboutRef);
+                              else if (item === 'Security') scrollToSection(securityRef);
+                              else if (item === 'Privacy Policy') navigate('/privacy-policy');
+                              else if (item === 'Terms of Service') navigate('/terms-of-service');
+                              else if (item === 'Contact') navigate('/contact');
+                              else if (item === 'Dashboard' || item === 'Transfer' || item === 'Withdraw') navigate('/login');
+                              else navigate('/');
+                 }}
                   >
                     {item}
                   </p>

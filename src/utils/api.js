@@ -81,6 +81,55 @@ export const api = {
   rejectStage: (requestId, stageIndex, data) =>
     apiClient.put(`/api/admin/withdrawals/${requestId}/stage/${stageIndex}/reject`, data),
   getAdminTxns: (params) => apiClient.get('/api/admin/transactions', { params }),
+
+  // ============== CONTACT ENDPOINTS ==============
+  
+  /**
+   * Submit a contact form (public - no auth required)
+   * @param {Object} data - Contact form data
+   * @param {string} data.fullName - Full name of the user
+   * @param {string} data.email - User's email
+   * @param {string} data.priority - 'urgent', 'high', 'medium', or 'low'
+   * @param {string} data.subject - Subject of the message
+   * @param {string} data.message - Message content (min 10 chars)
+   * @returns {Promise} Response with contact data
+   */
+  submitContact: (data) => apiClient.post('/api/contact', data),
+
+  /**
+   * Get all contact submissions (admin only)
+   * @param {Object} params - Query parameters
+   * @param {number} params.page - Page number (default: 1)
+   * @param {number} params.limit - Items per page (default: 20)
+   * @param {string} params.status - Filter by status: 'open', 'in_review', 'resolved', 'closed'
+   * @param {string} params.priority - Filter by priority: 'urgent', 'high', 'medium', 'low'
+   * @returns {Promise} Response with contacts list and summaries
+   */
+  getContacts: (params) => apiClient.get('/api/contact', { params }),
+
+  /**
+   * Get a single contact by ID (admin only)
+   * @param {string} id - Contact ID
+   * @returns {Promise} Response with contact details
+   */
+  getContactById: (id) => apiClient.get(`/api/contact/${id}`),
+
+  /**
+   * Update contact status (admin only)
+   * @param {string} id - Contact ID
+   * @param {Object} data - Update data
+   * @param {string} data.status - New status: 'open', 'in_review', 'resolved', 'closed'
+   * @param {string} data.adminNote - Optional admin note
+   * @returns {Promise} Response with updated contact
+   */
+  updateContactStatus: (id, data) => apiClient.put(`/api/contact/${id}/status`, data),
+
+  /**
+   * Delete a contact (admin only)
+   * @param {string} id - Contact ID
+   * @returns {Promise} Response with success message
+   */
+  deleteContact: (id) => apiClient.delete(`/api/contact/${id}`),
 };
 
 // Helper constants and formatters

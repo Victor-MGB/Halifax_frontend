@@ -10,6 +10,7 @@ const PIE_COLORS = ['#C9A84C', '#3ECFCF', '#4ADE80', '#A78BFA', '#F87171', '#FBB
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: '📊' },
+  { id: 'contacts', label: 'Contacts', icon: '✉️', badge: true },
   { id: 'withdrawals', label: 'Withdrawals', icon: '🔄', badge: true },
   { id: 'fund', label: 'Fund Users', icon: '💰' },
   { id: 'users', label: 'Users', icon: '👥' },
@@ -24,6 +25,30 @@ const StageStatusBadge = ({ status }) => {
     rejected: { bg: 'rgba(248,113,113,0.1)', color: 'var(--red)', label: 'Rejected' },
   };
   const s = styles[status] || styles.pending;
+  return <span style={{ padding: '2px 8px', borderRadius: 12, background: s.bg, color: s.color, fontSize: 10, fontWeight: 500 }}>{s.label}</span>;
+};
+
+// Contact Status Badge
+const ContactStatusBadge = ({ status }) => {
+  const styles = {
+    open: { bg: 'rgba(251,191,36,0.1)', color: 'var(--amber)', label: 'Open' },
+    in_review: { bg: 'rgba(59,130,246,0.1)', color: '#60A5FA', label: 'In Review' },
+    resolved: { bg: 'rgba(74,222,128,0.1)', color: 'var(--green)', label: 'Resolved' },
+    closed: { bg: 'rgba(107,114,128,0.1)', color: 'var(--muted)', label: 'Closed' },
+  };
+  const s = styles[status] || styles.open;
+  return <span style={{ padding: '2px 8px', borderRadius: 12, background: s.bg, color: s.color, fontSize: 10, fontWeight: 500 }}>{s.label}</span>;
+};
+
+// Contact Priority Badge
+const ContactPriorityBadge = ({ priority }) => {
+  const styles = {
+    low: { bg: 'rgba(107,114,128,0.1)', color: 'var(--muted)', label: 'Low' },
+    medium: { bg: 'rgba(59,130,246,0.1)', color: '#60A5FA', label: 'Medium' },
+    high: { bg: 'rgba(251,191,36,0.1)', color: 'var(--amber)', label: 'High' },
+    urgent: { bg: 'rgba(248,113,113,0.1)', color: 'var(--red)', label: 'Urgent' },
+  };
+  const s = styles[priority] || styles.medium;
   return <span style={{ padding: '2px 8px', borderRadius: 12, background: s.bg, color: s.color, fontSize: 10, fontWeight: 500 }}>{s.label}</span>;
 };
 
@@ -58,6 +83,20 @@ export default function AdminApp() {
   const [txPage, setTxPage] = useState(1);
   const [txPages, setTxPages] = useState(1);
 
+  // Contact states
+  const [contacts, setContacts] = useState([]);
+  const [contactFilters, setContactFilters] = useState({ status: '', priority: '' });
+  const [contactPage, setContactPage] = useState(1);
+  const [contactPages, setContactPages] = useState(1);
+  const [contactTotal, setContactTotal] = useState(0);
+  const [contactSummary, setContactSummary] = useState([]);
+  const [contactPrioritySummary, setContactPrioritySummary] = useState([]);
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [showContactDetail, setShowContactDetail] = useState(false);
+  const [statusUpdateData, setStatusUpdateData] = useState({ status: '', adminNote: '' });
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
+
   // Fund form
   const [fundForm, setFundForm] = useState({ userId: '', accountId: '', amount: '', currency: 'USD', description: '' });
   const [fundAccounts, setFundAccounts] = useState([]);
@@ -73,16 +112,41 @@ export default function AdminApp() {
   const [userSearch, setUserSearch] = useState('');
 
   const pendingCount = withdrawals.filter(w => w.stages?.some(s => s.status === 'pending')).length;
+  const openContactsCount = contacts.filter(c => c.status === 'open').length;
 
   const loadAnalytics = () => api.getAnalytics().then(r => setAnalytics(r.data)).catch(() => { });
   const loadWithdrawals = () => api.getAdminWithdrawals().then(r => setWithdrawals(r.data.requests || [])).catch(() => { });
   const loadUsers = useCallback(() => api.getAdminUsers({ search: userSearch }).then(r => setUsers(r.data.users || [])).catch(() => { }), [userSearch]);
   const loadTxns = useCallback(() => api.getAdminTxns({ page: txPage }).then(r => { setTxns(r.data.transactions || []); setTxPages(r.data.pages || 1); }).catch(() => { }), [txPage]);
 
+  // Load contacts
+  const loadContacts = useCallback(async () => {
+    setContactLoading(true);
+    try {
+      const params = {
+        page: contactPage,
+        limit: 10,
+        ...(contactFilters.status && { status: contactFilters.status }),
+        ...(contactFilters.priority && { priority: contactFilters.priority }),
+      };
+      const res = await api.getContacts(params);
+      setContacts(res.data.contacts || []);
+      setContactTotal(res.data.total || 0);
+      setContactPages(res.data.pages || 1);
+      setContactSummary(res.data.summary || []);
+      setContactPrioritySummary(res.data.prioritySummary || []);
+    } catch (err) {
+      console.error('Error loading contacts:', err);
+    } finally {
+      setContactLoading(false);
+    }
+  }, [contactPage, contactFilters]);
+
   useEffect(() => { loadAnalytics(); loadWithdrawals(); }, []);
   useEffect(() => { if (tab === 'users') loadUsers(); }, [tab, loadUsers]);
   useEffect(() => { if (tab === 'transactions') loadTxns(); }, [tab, loadTxns]);
   useEffect(() => { if (tab === 'withdrawals') loadWithdrawals(); }, [tab]);
+  useEffect(() => { if (tab === 'contacts') loadContacts(); }, [tab, loadContacts]);
 
   useEffect(() => {
     const iv = setInterval(loadWithdrawals, 20000);
@@ -139,6 +203,34 @@ export default function AdminApp() {
     }
   };
 
+  // Contact handlers
+  const handleUpdateStatus = async () => {
+    if (!selectedContact || !statusUpdateData.status) return;
+    try {
+      await api.updateContactStatus(selectedContact._id, statusUpdateData);
+      await loadContacts();
+      setShowStatusModal(false);
+      setStatusUpdateData({ status: '', adminNote: '' });
+      setSelectedContact(null);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update status');
+    }
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    if (!window.confirm('Are you sure you want to delete this contact message?')) return;
+    try {
+      await api.deleteContact(contactId);
+      await loadContacts();
+      if (selectedContact?._id === contactId) {
+        setSelectedContact(null);
+        setShowContactDetail(false);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete contact');
+    }
+  };
+
   const monthlyData = analytics?.monthlyVolume?.map(m => ({
     name: MONTHS[(m._id.m || m._id.month || 1) - 1],
     volume: Math.round(m.volume), count: m.count,
@@ -170,6 +262,16 @@ export default function AdminApp() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {openContactsCount > 0 && (
+            <div style={{
+              background: 'rgba(251,191,36,0.1)',
+              padding: '4px 10px', borderRadius: 20,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--amber)' }} />
+              <span style={{ fontSize: 11, color: 'var(--amber)' }}>{openContactsCount}</span>
+            </div>
+          )}
           {pendingCount > 0 && (
             <div style={{
               background: 'rgba(251,191,36,0.1)',
@@ -194,7 +296,7 @@ export default function AdminApp() {
 
       <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: 'calc(100vh - 68px)' }}>
 
-        {/* Sidebar - Mobile and Desktop */}
+        {/* Sidebar */}
         <div style={{
           position: isMobile ? 'fixed' : 'sticky',
           top: isMobile ? 0 : '68px',
@@ -209,7 +311,6 @@ export default function AdminApp() {
           overflowY: 'auto',
         }}>
           <div style={{ padding: '20px 16px' }}>
-            {/* Logo area for mobile sidebar */}
             {isMobile && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 12,
@@ -231,6 +332,7 @@ export default function AdminApp() {
 
             {TABS.map(t => {
               const isActive = tab === t.id;
+              const badgeCount = t.id === 'contacts' ? openContactsCount : t.id === 'withdrawals' ? pendingCount : 0;
               return (
                 <button
                   key={t.id}
@@ -257,7 +359,7 @@ export default function AdminApp() {
                     <span style={{ fontSize: 18 }}>{t.icon}</span>
                     <span>{t.label}</span>
                   </div>
-                  {t.badge && pendingCount > 0 && (
+                  {t.badge && badgeCount > 0 && (
                     <span style={{
                       background: 'var(--amber)',
                       color: '#050709',
@@ -265,7 +367,7 @@ export default function AdminApp() {
                       padding: '2px 8px',
                       fontSize: 11,
                       fontWeight: 700,
-                    }}>{pendingCount}</span>
+                    }}>{badgeCount}</span>
                   )}
                 </button>
               );
@@ -289,7 +391,6 @@ export default function AdminApp() {
               </button>
             </div>
 
-            {/* User Info in Mobile Sidebar */}
             {isMobile && (
               <div style={{
                 marginTop: 32,
@@ -366,6 +467,19 @@ export default function AdminApp() {
                 </h2>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                {openContactsCount > 0 && (
+                  <div style={{
+                    background: 'rgba(251,191,36,0.1)',
+                    padding: '6px 12px',
+                    borderRadius: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--amber)' }} />
+                    <span style={{ fontSize: 12, color: 'var(--amber)' }}>{openContactsCount} Open Contacts</span>
+                  </div>
+                )}
                 {pendingCount > 0 && (
                   <div style={{
                     background: 'rgba(251,191,36,0.1)',
@@ -500,6 +614,184 @@ export default function AdminApp() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ── CONTACTS ── */}
+          {tab === 'contacts' && (
+            <div>
+              {/* Filters */}
+              <div style={{
+                display: 'flex',
+                gap: 12,
+                marginBottom: 20,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+              }}>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+                  <select
+                    value={contactFilters.status}
+                    onChange={e => {
+                      setContactFilters(f => ({ ...f, status: e.target.value }));
+                      setContactPage(1);
+                    }}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: 8,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text)',
+                      fontSize: 12,
+                      minWidth: 120,
+                    }}
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_review">In Review</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                  <select
+                    value={contactFilters.priority}
+                    onChange={e => {
+                      setContactFilters(f => ({ ...f, priority: e.target.value }));
+                      setContactPage(1);
+                    }}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: 8,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text)',
+                      fontSize: 12,
+                      minWidth: 120,
+                    }}
+                  >
+                    <option value="">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </div>
+                <button
+                  onClick={loadContacts}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    color: 'var(--text)',
+                  }}
+                >
+                  🔄 Refresh
+                </button>
+              </div>
+
+              {/* Summary Stats */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+                gap: 10,
+                marginBottom: 20,
+              }}>
+                {contactSummary.map(s => (
+                  <div key={s._id} className="card" style={{ padding: '12px', textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase' }}>{s._id}</p>
+                    <p style={{ fontSize: 20, fontWeight: 500, color: 'var(--gold)' }}>{s.count}</p>
+                  </div>
+                ))}
+                {contactSummary.length === 0 && (
+                  <div className="card" style={{ padding: '12px', textAlign: 'center', gridColumn: '1 / -1' }}>
+                    <p style={{ fontSize: 12, color: 'var(--muted)' }}>No contacts found</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact List */}
+              {contactLoading ? (
+                <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
+                  <p style={{ color: 'var(--muted)' }}>Loading contacts...</p>
+                </div>
+              ) : contacts.length === 0 ? (
+                <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
+                  <p style={{ fontSize: 48, marginBottom: 12 }}>✉️</p>
+                  <p style={{ fontSize: 16, color: 'var(--muted)' }}>No contact submissions</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {contacts.map(contact => (
+                    <div key={contact._id} className="card" style={{ padding: '16px 20px', cursor: 'pointer' }} onClick={() => { setSelectedContact(contact); setShowContactDetail(true); }}>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'space-between',
+                        alignItems: isMobile ? 'flex-start' : 'center',
+                        gap: 8,
+                      }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                            <p style={{ fontWeight: 500, fontSize: 14 }}>{contact.fullName}</p>
+                            <ContactPriorityBadge priority={contact.priority} />
+                            <ContactStatusBadge status={contact.status} />
+                          </div>
+                          <p style={{ fontSize: 12, color: 'var(--muted)' }}>{contact.email}</p>
+                          <p style={{ fontSize: 13, marginTop: 4 }}>{contact.subject}</p>
+                          <p style={{ fontSize: 11, color: 'var(--muted2)', marginTop: 2 }}>
+                            {fmtDate(contact.createdAt)} · {fmtTime(contact.createdAt)}
+                          </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <span style={{ fontSize: 20 }}>→</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {contactPages > 1 && (
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 24 }}>
+                  <button
+                    className="btn-outline"
+                    onClick={() => setContactPage(p => Math.max(1, p - 1))}
+                    disabled={contactPage === 1}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: 8,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      cursor: contactPage === 1 ? 'default' : 'pointer',
+                      opacity: contactPage === 1 ? 0.5 : 1,
+                      color: 'var(--text)',
+                    }}
+                  >
+                    ← Prev
+                  </button>
+                  <span style={{ padding: '8px 14px', fontSize: 11, color: 'var(--muted)' }}>
+                    {contactPage} / {contactPages}
+                  </span>
+                  <button
+                    className="btn-outline"
+                    onClick={() => setContactPage(p => Math.min(contactPages, p + 1))}
+                    disabled={contactPage === contactPages}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: 8,
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      cursor: contactPage === contactPages ? 'default' : 'pointer',
+                      opacity: contactPage === contactPages ? 0.5 : 1,
+                      color: 'var(--text)',
+                    }}
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -812,13 +1104,198 @@ export default function AdminApp() {
             </div>
           )}
 
-                    {tab === 'monitoring' && (
+          {tab === 'monitoring' && (
             <div className="animate-in">
               <AdminMonitoring />
             </div>
           )}
         </main>
       </div>
+
+      {/* Contact Detail Modal */}
+      {showContactDetail && selectedContact && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(5,7,9,0.85)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 20,
+        }}>
+          <div className="card" style={{
+            maxWidth: 600,
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            padding: '32px',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+              <h3 style={{ fontSize: 22 }}>Contact Details</h3>
+              <button
+                onClick={() => { setShowContactDetail(false); setSelectedContact(null); }}
+                style={{
+                  background: 'none', border: 'none', fontSize: 24, cursor: 'pointer',
+                  color: 'var(--muted)',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                <ContactPriorityBadge priority={selectedContact.priority} />
+                <ContactStatusBadge status={selectedContact.status} />
+              </div>
+              <p style={{ fontSize: 20, fontWeight: 500, marginBottom: 4 }}>{selectedContact.fullName}</p>
+              <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 12 }}>{selectedContact.email}</p>
+              <p style={{ fontSize: 13, color: 'var(--muted2)' }}>
+                {fmtDate(selectedContact.createdAt)} · {fmtTime(selectedContact.createdAt)}
+              </p>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, marginBottom: 4 }}>SUBJECT</p>
+              <p style={{ fontSize: 16 }}>{selectedContact.subject}</p>
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, marginBottom: 4 }}>MESSAGE</p>
+              <div style={{
+                padding: '16px',
+                background: 'rgba(255,255,255,0.02)',
+                borderRadius: 10,
+                border: '1px solid var(--border)',
+                whiteSpace: 'pre-wrap',
+                fontSize: 14,
+                lineHeight: 1.6,
+                maxHeight: 200,
+                overflow: 'auto',
+              }}>
+                {selectedContact.message}
+              </div>
+            </div>
+
+            {selectedContact.adminNote && (
+              <div style={{ marginBottom: 24 }}>
+                <p style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, marginBottom: 4 }}>ADMIN NOTE</p>
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(201,168,76,0.05)',
+                  borderRadius: 8,
+                  borderLeft: '3px solid var(--gold)',
+                  fontSize: 13,
+                }}>
+                  {selectedContact.adminNote}
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => {
+                  setStatusUpdateData({ status: selectedContact.status, adminNote: selectedContact.adminNote || '' });
+                  setShowStatusModal(true);
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px 16px',
+                  borderRadius: 8,
+                  background: 'rgba(59,130,246,0.1)',
+                  border: '1px solid rgba(59,130,246,0.2)',
+                  color: '#60A5FA',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                }}
+              >
+                ✏️ Update Status
+              </button>
+              <button
+                onClick={() => handleDeleteContact(selectedContact._id)}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 8,
+                  background: 'rgba(248,113,113,0.1)',
+                  border: '1px solid rgba(248,113,113,0.2)',
+                  color: 'var(--red)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                }}
+              >
+                🗑 Delete
+              </button>
+              <button
+                onClick={() => { setShowContactDetail(false); setSelectedContact(null); }}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: 8,
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Update Modal */}
+      {showStatusModal && selectedContact && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1001,
+          background: 'rgba(5,7,9,0.85)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 20,
+        }}>
+          <div className="card" style={{ maxWidth: 440, width: '100%', padding: '32px' }}>
+            <h3 style={{ fontSize: 20, marginBottom: 20 }}>Update Status</h3>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, display: 'block', marginBottom: 4 }}>Status</label>
+              <select
+                value={statusUpdateData.status}
+                onChange={e => setStatusUpdateData(d => ({ ...d, status: e.target.value }))}
+                style={{ width: '100%', padding: 12, borderRadius: 10 }}
+              >
+                <option value="open">Open</option>
+                <option value="in_review">In Review</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, display: 'block', marginBottom: 4 }}>Admin Note</label>
+              <input
+                value={statusUpdateData.adminNote}
+                onChange={e => setStatusUpdateData(d => ({ ...d, adminNote: e.target.value }))}
+                placeholder="Add a note about this contact..."
+                style={{ width: '100%', padding: 12, borderRadius: 10 }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="btn-outline"
+                style={{ flex: 1 }}
+                onClick={() => { setShowStatusModal(false); setStatusUpdateData({ status: '', adminNote: '' }); }}
+              >
+                Cancel
+              </button>
+              <button
+                style={{
+                  flex: 1, padding: 12, borderRadius: 10, border: 'none', cursor: 'pointer',
+                  background: 'rgba(59,130,246,0.1)',
+                  color: '#60A5FA',
+                }}
+                onClick={handleUpdateStatus}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stage Action Modal */}
       {activeStageAction && (
         <div style={{
