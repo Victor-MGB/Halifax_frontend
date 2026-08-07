@@ -17,9 +17,10 @@ import TermsOfService from './pages/TermsOfService';
 import Contact from './pages/Contact';
 
 const Loader = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--void)', flexDirection: 'column', gap: 16 }}>
-    <div style={{ width: 40, height: 40, border: '2px solid var(--border)', borderTopColor: 'var(--gold)', borderRadius: '50%' }} className="spin" />
-    <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--muted)', letterSpacing: 3 }}>LOADING</p>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)', flexDirection: 'column', gap: 20 }}>
+    <div style={{ width: 40, height: 40, border: '2px solid var(--border)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    <div style={{ width: 160, height: 8, borderRadius: 4 }} className="skeleton" />
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
   </div>
 );
 
@@ -63,14 +64,14 @@ function AppRoutes() {
         
       </Route>
 
-      <Route path="/monitoring" element={<AdminMonitoring />} />
+      <Route path="/monitoring" element={<div className="theme-dark"><AdminMonitoring /></div>} />
       
       {/* Admin route - only admin users */}
       <Route 
         path="/admin" 
         element={
           <AdminRoute>
-            <AdminApp />
+            <div className="theme-dark"><AdminApp /></div>
           </AdminRoute>
         } 
       />

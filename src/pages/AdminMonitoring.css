@@ -70,7 +70,7 @@
 }
 
 .refresh-btn:hover {
-  background: rgba(201,168,76,0.1);
+  background: rgba(30,64,175,0.08);
   border-color: var(--gold);
 }
 
@@ -258,7 +258,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(201,168,76,0.03) 0%, transparent 100%);
+  background: linear-gradient(135deg, rgba(30,64,175,0.03) 0%, transparent 100%);
   border: 1px solid var(--border);
   border-radius: 12px;
 }

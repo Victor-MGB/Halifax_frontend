@@ -3,13 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api'; 
 import './Contact.css';
 
+const Icon = ({ d, size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+);
+
 export default function Contact() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     priority: 'medium',
-    subject: 'General Question', // Changed to match schema enum
+    subject: 'General Question',
     message: ''
   });
   
@@ -23,14 +29,12 @@ export default function Contact() {
       ...formData, 
       [e.target.name]: e.target.value 
     });
-    // Clear errors when user starts typing
     if (error) setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (formData.message.length < 10) {
       setError('Message must be at least 10 characters long');
       return;
@@ -41,23 +45,19 @@ export default function Contact() {
     setSubmitted(false);
 
     try {
-      // Prepare data matching your database schema exactly
       const contactData = {
         fullName: formData.fullName.trim(),
         email: formData.email.trim().toLowerCase(),
         priority: formData.priority,
-        subject: formData.subject, // Now using enum value from dropdown
+        subject: formData.subject,
         message: formData.message.trim()
       };
 
-      // Submit to backend
       const response = await api.submitContact(contactData);
       
-      // Success
       setSubmitted(true);
       setSuccessMessage(response.data.message || 'Your message has been received. We will get back to you shortly.');
       
-      // Reset form
       setFormData({
         fullName: '',
         email: '',
@@ -66,33 +66,35 @@ export default function Contact() {
         message: ''
       });
 
-      // Auto-hide success message after 8 seconds
       setTimeout(() => {
         setSubmitted(false);
         setSuccessMessage('');
       }, 8000);
 
     } catch (err) {
-      // Handle errors
       console.error('Contact submission error:', err);
       
       if (err.response) {
-        // Server responded with error
         const errorMsg = err.response.data?.message || 
                          err.response.data?.error || 
                          'Failed to send message. Please try again.';
         setError(errorMsg);
       } else if (err.request) {
-        // Request made but no response
         setError('Network error. Please check your connection and try again.');
       } else {
-        // Something else went wrong
         setError('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
     }
   };
+
+  const METHODS = [
+    { icon: <Icon d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z" />, title: 'Phone Support', lines: [<a key="p" href="tel:+17163488181">+17163488181</a>, 'Available 24/7 for emergencies'], tint: 'primary' },
+    { icon: <Icon d="M4 5h16v14H4zM4 7l8 6 8-6" />, title: 'Email', lines: [<a key="e" href="mailto:halifaxoffshore8@gmail.com">halifaxoffshore8@gmail.com</a>, 'Response within 2 business hours'], tint: 'green' },
+    { icon: <Icon d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />, title: 'Secure Messaging', lines: ['Available through your online dashboard', 'Encrypted and confidential'], tint: 'purple' },
+    { icon: <Icon d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Zm-5 0a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />, title: 'Office Address', lines: ['123 Financial District, Suite 400', 'New York, NY 10005', 'By appointment only'], tint: 'amber' },
+  ];
 
   return (
     <div className="contact-page">
@@ -102,55 +104,29 @@ export default function Contact() {
         </button>
 
         <div className="contact-header">
-          <h1>Contact Us</h1>
+          <p className="contact-eyebrow">Client support</p>
+          <h1>Contact us</h1>
           <p className="contact-subtitle">
-            Our team is available 24/7 to assist with your banking needs
+            Our team is available around the clock to assist with your banking needs
           </p>
         </div>
 
         <div className="contact-grid">
           <div className="contact-info">
-            <h2>Get in Touch</h2>
-            
-            <div className="contact-method">
-              <div className="contact-icon">📞</div>
-              <div>
-                <h3>Phone Support</h3>
-                <p>+17163488181</p>
-                <p className="contact-method-detail">Available 24/7 for emergencies</p>
+            {METHODS.map(m => (
+              <div key={m.title} className="contact-method">
+                <div className={`contact-icon tint-${m.tint}`}>{m.icon}</div>
+                <div>
+                  <h3>{m.title}</h3>
+                  {m.lines.map((l, i) => (
+                    <p key={i} className={i === m.lines.length - 1 ? 'contact-method-detail' : ''}>{l}</p>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="contact-method">
-              <div className="contact-icon">✉️</div>
-              <div>
-                <h3>Email</h3>
-                <p><a href="mailto:support@halifx.com">halifaxoffshore8@gmail.com</a></p>
-                <p className="contact-method-detail">Response within 2 business hours</p>
-              </div>
-            </div>
-
-            <div className="contact-method">
-              <div className="contact-icon">💬</div>
-              <div>
-                <h3>Secure Messaging</h3>
-                <p>Available through your online dashboard</p>
-                <p className="contact-method-detail">Encrypted and confidential</p>
-              </div>
-            </div>
-
-            <div className="contact-method">
-              <div className="contact-icon">📍</div>
-              <div>
-                <h3>Office Address</h3>
-                <p>123 Financial District, Suite 400</p>
-                <p>New York, NY 10005</p>
-                <p className="contact-method-detail">By appointment only</p>
-              </div>
-            </div>
+            ))}
 
             <div className="contact-hours">
-              <h3>Business Hours</h3>
+              <h3><Icon d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-14v6l4 2" size={16} /> Business Hours</h3>
               <ul>
                 <li><span>Monday - Friday:</span> 8:00 AM - 8:00 PM EST</li>
                 <li><span>Saturday:</span> 9:00 AM - 5:00 PM EST</li>
@@ -163,20 +139,18 @@ export default function Contact() {
           </div>
 
           <div className="contact-form-wrapper">
-            <h2>Send a Message</h2>
+            <h2>Send a message</h2>
             
-            {/* Display error message */}
             {error && (
               <div className="contact-error">
-                <span className="error-icon">❌</span>
+                <Icon d="M18 6 6 18M6 6l12 12" size={17} />
                 {error}
               </div>
             )}
 
-            {/* Display success message */}
             {submitted && (
               <div className="contact-success">
-                <span className="success-icon">✅</span>
+                <Icon d="M20 6 9 17l-5-5" size={17} />
                 {successMessage}
               </div>
             )}
@@ -210,7 +184,6 @@ export default function Contact() {
                 />
               </div>
 
-              {/* Priority Selection - Matches schema enum */}
               <div className="form-group">
                 <label htmlFor="priority">Priority Level *</label>
                 <select
@@ -224,11 +197,10 @@ export default function Contact() {
                   <option value="low">Low - General Inquiry</option>
                   <option value="medium">Medium - Standard Support</option>
                   <option value="high">High - Urgent Issue</option>
-                  <option value="urgent">🚨 Urgent - Emergency</option>
+                  <option value="urgent">Urgent - Emergency</option>
                 </select>
               </div>
 
-              {/* Subject Selection - Now using dropdown with schema enum values */}
               <div className="form-group">
                 <label htmlFor="subject">Subject *</label>
                 <select
@@ -264,20 +236,20 @@ export default function Contact() {
                   disabled={loading}
                   minLength="10"
                 />
-                <small className={`char-count ${formData.message.length >= 10 ? 'valid' : 'invalid'}`}>
+                <small className={`char-count ${formData.message.length >= 10 ? 'valid' : formData.message.length > 0 ? 'invalid' : ''}`}>
                   {formData.message.length}/10 characters minimum
                   {formData.message.length > 0 && formData.message.length < 10 && 
                     ` (${10 - formData.message.length} more needed)`
                   }
-                  {formData.message.length >= 10 && ' ✅'}
                 </small>
               </div>
 
               <div className="form-note">
-                <p>
-                  ⚠️ For urgent matters, especially fraud or security concerns, 
+                <Icon d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" size={16} />
+                <span>
+                  For urgent matters, especially fraud or security concerns,
                   please call our emergency hotline immediately.
-                </p>
+                </span>
               </div>
 
               <button 
@@ -287,10 +259,13 @@ export default function Contact() {
               >
                 {loading ? (
                   <>
-                    <span className="spinner">⏳</span> Sending...
+                    <span className="spinner" /> Sending...
                   </>
                 ) : (
-                  'Send Message'
+                  <>
+                    <Icon d="M4 5h16v14H4zM4 7l8 6 8-6" size={16} />
+                    Send Message
+                  </>
                 )}
               </button>
             </form>
@@ -299,7 +274,9 @@ export default function Contact() {
 
         <div className="contact-emergency">
           <div className="emergency-banner">
-            <span className="emergency-icon">⚠️</span>
+            <div className="emergency-icon">
+              <Icon d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" size={26} />
+            </div>
             <div>
               <h3>Emergency Support</h3>
               <p>

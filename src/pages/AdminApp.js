@@ -6,16 +6,22 @@ import { api, fmt, fmtDate, fmtTime, CURRENCIES } from '../utils/api';
 import AdminMonitoring from './AdminMonitoring';  
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const PIE_COLORS = ['#C9A84C', '#3ECFCF', '#4ADE80', '#A78BFA', '#F87171', '#FBBF24', '#80DEEA'];
+const PIE_COLORS = ['#3B82F6', '#14B8A6', '#10B981', '#8B5CF6', '#F87171', '#F59E0B', '#60A5FA'];
+
+const ICON = ({ d, size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+);
 
 const TABS = [
-  { id: 'overview', label: 'Overview', icon: '📊' },
-  { id: 'contacts', label: 'Contacts', icon: '✉️', badge: true },
-  { id: 'withdrawals', label: 'Withdrawals', icon: '🔄', badge: true },
-  { id: 'fund', label: 'Fund Users', icon: '💰' },
-  { id: 'users', label: 'Users', icon: '👥' },
-  { id: 'transactions', label: 'Transactions', icon: '📜' },
-  { id: 'monitoring', label: 'Monitoring', icon: '📡'}
+  { id: 'overview', label: 'Overview', icon: <ICON d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Zm9-6v6l3 2" /> },
+  { id: 'contacts', label: 'Contacts', icon: <ICON d="M4 5h16v14H4zM4 7l8 6 8-6" />, badge: true },
+  { id: 'withdrawals', label: 'Withdrawals', icon: <ICON d="M7 4v13m0 0-3-3m3 3 3-3M17 20V7m0 0-3 3m3-3 3 3" />, badge: true },
+  { id: 'fund', label: 'Fund Users', icon: <ICON d="M12 3v18m0 0 4-4m-4 4-4-4M3 8h18" /> },
+  { id: 'users', label: 'Users', icon: <ICON d="M16 21v-2a4 4 0 0 0-8 0v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm9 10v-2a4 4 0 0 0-3-3.87M3 19v-2a4 4 0 0 1 3-3.87" /> },
+  { id: 'transactions', label: 'Transactions', icon: <ICON d="M6 2h9l5 5v15H6zM14 2v5h5M9 12h6M9 16h6" /> },
+  { id: 'monitoring', label: 'Monitoring', icon: <ICON d="M22 12h-4l-3 8-6-16-3 8H2" /> },
 ];
 
 const StageStatusBadge = ({ status }) => {
@@ -244,49 +250,51 @@ export default function AdminApp() {
       {/* Mobile Header */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 200,
-        background: 'var(--deep)', borderBottom: '1px solid var(--border)',
+        background: 'linear-gradient(180deg, #16285F 0%, #1E3A8A 55%, #1E40AF 100%)',
+        boxShadow: '0 4px 16px rgba(30,58,138,0.3)',
         padding: '12px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg, #C9A84C, #E8C97A)',
+            background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.28)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, color: '#050709', fontSize: 16,
-          }}>N</div>
+            fontWeight: 700, color: '#fff', fontSize: 16,
+          }}>HO</div>
           <div>
-            <p style={{ fontSize: 14, fontWeight: 500 }}>Halifax Offshore Admin</p>
-            <p style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: 1 }}>CONTROL CENTER</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>Halifax Offshore Admin</p>
+            <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.6)', letterSpacing: 1 }}>CONTROL CENTER</p>
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {openContactsCount > 0 && (
             <div style={{
-              background: 'rgba(251,191,36,0.1)',
+              background: 'rgba(251,191,36,0.2)',
               padding: '4px 10px', borderRadius: 20,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--amber)' }} />
-              <span style={{ fontSize: 11, color: 'var(--amber)' }}>{openContactsCount}</span>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FBBF24' }} />
+              <span style={{ fontSize: 11, color: '#FDE68A' }}>{openContactsCount}</span>
             </div>
           )}
           {pendingCount > 0 && (
             <div style={{
-              background: 'rgba(251,191,36,0.1)',
+              background: 'rgba(251,191,36,0.2)',
               padding: '4px 10px', borderRadius: 20,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--amber)' }} />
-              <span style={{ fontSize: 11, color: 'var(--amber)' }}>{pendingCount}</span>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FBBF24' }} />
+              <span style={{ fontSize: 11, color: '#FDE68A' }}>{pendingCount}</span>
             </div>
           )}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             style={{
-              background: 'none', border: 'none', fontSize: 24, cursor: 'pointer',
-              color: 'var(--text)', padding: 8, display: isMobile ? 'block' : 'none',
+              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)',
+              fontSize: 18, cursor: 'pointer', color: '#fff', padding: '6px 10px',
+              borderRadius: 9, display: isMobile ? 'block' : 'none', lineHeight: 1,
             }}
           >
             {mobileMenuOpen ? '✕' : '☰'}
@@ -303,29 +311,30 @@ export default function AdminApp() {
           left: 0,
           width: isMobile ? '280px' : '240px',
           height: isMobile ? '100vh' : 'calc(100vh - 68px)',
-          background: 'var(--deep)',
-          borderRight: '1px solid var(--border)',
+          background: 'linear-gradient(180deg, #16285F 0%, #1E3A8A 55%, #1E40AF 100%)',
+          color: '#fff',
           transform: isMobile ? `translateX(${mobileMenuOpen ? '0' : '-100%'})` : 'none',
           transition: 'transform 0.3s ease',
           zIndex: 199,
           overflowY: 'auto',
+          boxShadow: '8px 0 32px rgba(30,58,138,0.12)',
         }}>
           <div style={{ padding: '20px 16px' }}>
             {isMobile && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 12,
                 marginBottom: 24, paddingBottom: 16,
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid rgba(255,255,255,0.15)'
               }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 8,
-                  background: 'linear-gradient(135deg, #C9A84C, #E8C97A)',
+                  background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.28)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, color: '#050709', fontSize: 14,
-                }}>N</div>
+                  fontWeight: 700, color: '#fff', fontSize: 14,
+                }}>HO</div>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 500 }}>Halifax Offshore Admin</p>
-                  <p style={{ fontSize: 8, color: 'var(--gold)' }}>CONTROL CENTER</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Halifax Offshore Admin</p>
+                  <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.55)' }}>CONTROL CENTER</p>
                 </div>
               </div>
             )}
@@ -346,9 +355,9 @@ export default function AdminApp() {
                     borderRadius: 12,
                     marginBottom: 6,
                     cursor: 'pointer',
-                    background: isActive ? 'rgba(201,168,76,0.12)' : 'transparent',
-                    color: isActive ? 'var(--gold2)' : 'var(--muted)',
-                    border: `1px solid ${isActive ? 'rgba(201,168,76,0.25)' : 'transparent'}`,
+                    background: isActive ? 'rgba(255,255,255,0.16)' : 'transparent',
+                    color: isActive ? '#fff' : 'rgba(255,255,255,0.62)',
+                    border: `1px solid ${isActive ? 'rgba(255,255,255,0.22)' : 'transparent'}`,
                     fontSize: 13,
                     fontFamily: 'var(--font-sans)',
                     transition: 'all 0.2s',
@@ -356,13 +365,13 @@ export default function AdminApp() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 18 }}>{t.icon}</span>
+                    <span style={{ display: 'inline-flex', width: 20, justifyContent: 'center' }}>{t.icon}</span>
                     <span>{t.label}</span>
                   </div>
                   {t.badge && badgeCount > 0 && (
                     <span style={{
-                      background: 'var(--amber)',
-                      color: '#050709',
+                      background: '#F59E0B',
+                      color: '#fff',
                       borderRadius: 12,
                       padding: '2px 8px',
                       fontSize: 11,
@@ -373,18 +382,19 @@ export default function AdminApp() {
               );
             })}
 
-            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.15)' }}>
               <button
                 onClick={() => navigate('/')}
                 style={{
                   width: '100%',
                   padding: '10px 16px',
                   borderRadius: 10,
-                  background: 'rgba(201,168,76,0.05)',
-                  border: '1px solid rgba(201,168,76,0.2)',
-                  color: 'var(--gold)',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.22)',
+                  color: '#fff',
                   fontSize: 12,
                   cursor: 'pointer',
+                  fontWeight: 600,
                 }}
               >
                 ← Back to Home
@@ -395,20 +405,20 @@ export default function AdminApp() {
               <div style={{
                 marginTop: 32,
                 padding: 16,
-                background: 'rgba(255,255,255,0.02)',
+                background: 'rgba(255,255,255,0.08)',
                 borderRadius: 12,
-                border: '1px solid var(--border)',
+                border: '1px solid rgba(255,255,255,0.15)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: '50%',
-                    background: 'var(--surface)',
+                    background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 600, color: 'var(--gold)',
+                    fontSize: 16, fontWeight: 600, color: '#fff',
                   }}>{user?.firstName?.[0]}{user?.lastName?.[0]}</div>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 500 }}>{user?.firstName} {user?.lastName}</p>
-                    <p style={{ fontSize: 10, color: 'var(--muted)' }}>Administrator</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{user?.firstName} {user?.lastName}</p>
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>Administrator</p>
                   </div>
                 </div>
                 <button
@@ -417,11 +427,12 @@ export default function AdminApp() {
                     width: '100%',
                     padding: '8px',
                     borderRadius: 8,
-                    background: 'rgba(248,113,113,0.1)',
-                    border: '1px solid rgba(248,113,113,0.2)',
-                    color: 'var(--red)',
+                    background: 'rgba(248,113,113,0.22)',
+                    border: '1px solid rgba(248,113,113,0.35)',
+                    color: '#FCA5A5',
                     fontSize: 11,
                     cursor: 'pointer',
+                    fontWeight: 600,
                   }}
                 >
                   Sign Out
@@ -459,10 +470,10 @@ export default function AdminApp() {
               marginBottom: 32,
             }}>
               <div>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--gold)', letterSpacing: 3, marginBottom: 4 }}>
+                <p className="app-page-title">
                   {tab.toUpperCase()} PANEL
                 </p>
-                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 400 }}>
+                <h2 className="app-page-h1" style={{ fontSize: 30 }}>
                   {TABS.find(t => t.id === tab)?.label}
                 </h2>
               </div>
@@ -531,10 +542,10 @@ export default function AdminApp() {
           {/* Mobile Tab Title */}
           {isMobile && (
             <div style={{ marginBottom: 24 }}>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--gold)', letterSpacing: 2, marginBottom: 4 }}>
+              <p className="app-page-title">
                 {tab.toUpperCase()} PANEL
               </p>
-              <h2 style={{ fontSize: 24, fontWeight: 400 }}>
+              <h2 className="app-page-h1" style={{ fontSize: 24 }}>
                 {TABS.find(t => t.id === tab)?.label}
               </h2>
             </div>
@@ -549,33 +560,41 @@ export default function AdminApp() {
                 gap: 16,
                 marginBottom: 24,
               }}>
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="app-stat-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <p style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>TOTAL CLIENTS</p>
-                    <span style={{ fontSize: 20, opacity: 0.4 }}>👥</span>
+                    <span className="icon-tile" style={{ width: 36, height: 36, background: 'var(--primary-light)', color: 'var(--primary)' }}>
+                      <ICON d="M16 21v-2a4 4 0 0 0-8 0v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm9 10v-2a4 4 0 0 0-3-3.87M3 19v-2a4 4 0 0 1 3-3.87" size={16} />
+                    </span>
                   </div>
-                  <p style={{ fontSize: 36, fontWeight: 500, color: 'var(--gold)' }}>{S.totalUsers || 0}</p>
+                  <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: -1 }}>{S.totalUsers || 0}</p>
                 </div>
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="app-stat-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <p style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>ACTIVE CLIENTS</p>
-                    <span style={{ fontSize: 20, opacity: 0.4 }}>✅</span>
+                    <span className="icon-tile" style={{ width: 36, height: 36, background: 'var(--green-light)', color: 'var(--green-dark)' }}>
+                      <ICON d="M20 6 9 17l-5-5" size={16} />
+                    </span>
                   </div>
-                  <p style={{ fontSize: 36, fontWeight: 500, color: 'var(--green)' }}>{S.activeUsers || 0}</p>
+                  <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: -1, color: 'var(--green-dark)' }}>{S.activeUsers || 0}</p>
                 </div>
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="app-stat-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <p style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>PENDING WITHDRAWALS</p>
-                    <span style={{ fontSize: 20, opacity: 0.4 }}>🔄</span>
+                    <span className="icon-tile" style={{ width: 36, height: 36, background: 'var(--amber-light)', color: 'var(--amber-dark)' }}>
+                      <ICON d="M12 7v5l3 2m5.5-1.5a8.5 8.5 0 1 1-2.5-6M3 4v5h5" size={16} />
+                    </span>
                   </div>
-                  <p style={{ fontSize: 36, fontWeight: 500, color: 'var(--amber)' }}>{S.pendingWithdrawals || 0}</p>
+                  <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: -1, color: 'var(--amber-dark)' }}>{S.pendingWithdrawals || 0}</p>
                 </div>
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="app-stat-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <p style={{ fontSize: 11, color: 'var(--muted)', letterSpacing: 1 }}>TOTAL VOLUME</p>
-                    <span style={{ fontSize: 20, opacity: 0.4 }}>💰</span>
+                    <span className="icon-tile" style={{ width: 36, height: 36, background: 'var(--purple-light)', color: 'var(--purple)' }}>
+                      <ICON d="M12 3v18m0 0 4-4m-4 4-4-4M3 8h18" size={16} />
+                    </span>
                   </div>
-                  <p style={{ fontSize: 28, fontWeight: 500 }}>{fmt(S.totalBalance)}</p>
+                  <p style={{ fontSize: 26, fontWeight: 700, letterSpacing: -0.5 }}>{fmt(S.totalBalance)}</p>
                 </div>
               </div>
 
@@ -684,9 +703,12 @@ export default function AdminApp() {
                     cursor: 'pointer',
                     fontSize: 12,
                     color: 'var(--text)',
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    fontWeight: 500,
                   }}
                 >
-                  🔄 Refresh
+                  <ICON d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6" size={14} />
+                  Refresh
                 </button>
               </div>
 
@@ -717,7 +739,9 @@ export default function AdminApp() {
                 </div>
               ) : contacts.length === 0 ? (
                 <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
-                  <p style={{ fontSize: 48, marginBottom: 12 }}>✉️</p>
+                  <div className="icon-tile" style={{ background: 'var(--primary-light)', color: 'var(--primary)', margin: '0 auto 16px', width: 56, height: 56, borderRadius: 16 }}>
+                    <ICON d="M4 5h16v14H4zM4 7l8 6 8-6" size={26} />
+                  </div>
                   <p style={{ fontSize: 16, color: 'var(--muted)' }}>No contact submissions</p>
                 </div>
               ) : (
@@ -800,7 +824,9 @@ export default function AdminApp() {
             <div>
               {withdrawals.length === 0 ? (
                 <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
-                  <p style={{ fontSize: 48, marginBottom: 12 }}>🔄</p>
+                  <div className="icon-tile" style={{ background: 'var(--primary-light)', color: 'var(--primary)', margin: '0 auto 16px', width: 56, height: 56, borderRadius: 16 }}>
+                    <ICON d="M7 4v13m0 0-3-3m3 3 3-3M17 20V7m0 0-3 3m3-3 3 3" size={26} />
+                  </div>
                   <p style={{ fontSize: 16, color: 'var(--muted)' }}>No withdrawal requests</p>
                 </div>
               ) : withdrawals.map(req => {
@@ -853,7 +879,7 @@ export default function AdminApp() {
                                 <StageStatusBadge status={stage.status} />
                               </div>
                               {stage.stageDesc && <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>{stage.stageDesc}</p>}
-                              {stage.adminNote && <p style={{ fontSize: 11, color: 'var(--teal)', marginTop: 4 }}>📝 {stage.adminNote}</p>}
+                              {stage.adminNote && <p style={{ fontSize: 11, color: 'var(--teal)', marginTop: 4 }}>Note: {stage.adminNote}</p>}
                             </div>
                             {stage.status === 'pending' && (
                               <div style={{ display: 'flex', gap: 8 }}>
@@ -935,10 +961,12 @@ export default function AdminApp() {
                 )}
 
                 <button
-                  style={{ width: '100%', padding: 14, borderRadius: 12, background: 'linear-gradient(135deg, #C9A84C, #B8942C)', color: '#050709', fontWeight: 600, border: 'none', cursor: 'pointer' }}
+                  className="btn-brand"
+                  style={{ width: '100%', padding: 14 }}
                   onClick={submitFund}
                   disabled={fundLoading || !fundForm.userId || !fundForm.accountId || !fundForm.amount}
                 >
+                  <ICON d="M12 3v18m0 0 4-4m-4 4-4-4M3 8h18" size={17} />
                   {fundLoading ? 'Processing...' : `Credit ${fundForm.currency} ${fundForm.amount || '0'}`}
                 </button>
               </div>
@@ -957,9 +985,15 @@ export default function AdminApp() {
                 />
                 <button
                   onClick={() => loadUsers()}
-                  style={{ padding: '12px 20px', borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', cursor: 'pointer' }}
+                  style={{
+                    padding: '12px 20px', borderRadius: 10,
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 7,
+                    fontSize: 12.5, fontWeight: 500, color: 'var(--text)',
+                  }}
                 >
-                  🔄 Refresh
+                  <ICON d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6" size={15} />
+                  Refresh
                 </button>
               </div>
 
@@ -993,10 +1027,11 @@ export default function AdminApp() {
                           {u.isActive ? 'Suspend' : 'Activate'}
                         </button>
                         <button
-                          style={{ padding: '6px 14px', borderRadius: 8, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: 'var(--red)', fontSize: 11, cursor: 'pointer' }}
+                          style={{ padding: '6px 14px', borderRadius: 8, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', color: 'var(--red)', fontSize: 11, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5, fontWeight: 600 }}
                           onClick={() => setShowDeleteConfirm({ userId: u._id, userName: `${u.firstName} ${u.lastName}` })}
                         >
-                          🗑 Delete
+                          <ICON d="M3 6h18M8 6V4h8v2m-9 0v14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6" size={13} />
+                          Delete
                         </button>
                       </div>
                     </div>
@@ -1006,8 +1041,8 @@ export default function AdminApp() {
                           flex: '1 1 200px',
                           padding: '12px',
                           borderRadius: 10,
-                          background: 'rgba(255,255,255,0.02)',
-                          border: `1px solid ${acc.isFrozen ? 'rgba(248,113,113,0.2)' : 'var(--border)'}`,
+                          background: 'var(--surface2)',
+                          border: `1px solid ${acc.isFrozen ? 'rgba(248,113,113,0.25)' : 'var(--border)'}`,
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                             <p style={{ fontSize: 11, fontWeight: 500 }}>{acc.accountType}</p>
@@ -1031,18 +1066,20 @@ export default function AdminApp() {
               {showDeleteConfirm && (
                 <div style={{
                   position: 'fixed', inset: 0, zIndex: 1000,
-                  background: 'rgba(5,7,9,0.85)',
+                  background: 'rgba(17,24,39,0.55)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
                 }}>
                   <div className="card" style={{ maxWidth: 440, width: '100%', padding: '32px' }}>
                     <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                      <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+                      <div className="icon-tile" style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--red-light)', color: 'var(--red)', margin: '0 auto 14px' }}>
+                        <ICON d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" size={26} />
+                      </div>
                       <h3 style={{ fontSize: 22, marginBottom: 8 }}>Delete User</h3>
                       <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>
                         Are you sure you want to delete <strong>{showDeleteConfirm.userName}</strong>?
                       </p>
                       <p style={{ fontSize: 11, color: 'var(--red)', background: 'rgba(248,113,113,0.1)', padding: 8, borderRadius: 8 }}>
-                        ⚠️ This will permanently delete ALL user data including:<br />
+                        This will permanently delete ALL user data including:<br />
                         accounts, transactions, withdrawal requests, and notifications.
                       </p>
                     </div>
@@ -1081,7 +1118,7 @@ export default function AdminApp() {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
                           <p style={{ fontWeight: 500, fontSize: 13 }}>{tx.description || tx.type}</p>
-                          <span style={{ padding: '2px 6px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', fontSize: 9 }}>{tx.type?.toUpperCase()}</span>
+                          <span style={{ padding: '2px 6px', borderRadius: 8, background: 'var(--surface2)', fontSize: 9, color: 'var(--muted)' }}>{tx.type?.toUpperCase()}</span>
                         </div>
                         <p style={{ fontSize: 11, color: 'var(--muted)' }}>
                           {tx.user?.firstName} {tx.user?.lastName} · {fmtDate(tx.createdAt)}
@@ -1116,7 +1153,7 @@ export default function AdminApp() {
       {showContactDetail && selectedContact && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'rgba(5,7,9,0.85)',
+          background: 'rgba(17,24,39,0.55)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 20,
         }}>
@@ -1161,7 +1198,7 @@ export default function AdminApp() {
               <p style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, marginBottom: 4 }}>MESSAGE</p>
               <div style={{
                 padding: '16px',
-                background: 'rgba(255,255,255,0.02)',
+                background: 'var(--surface2)',
                 borderRadius: 10,
                 border: '1px solid var(--border)',
                 whiteSpace: 'pre-wrap',
@@ -1179,9 +1216,9 @@ export default function AdminApp() {
                 <p style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, marginBottom: 4 }}>ADMIN NOTE</p>
                 <div style={{
                   padding: '12px',
-                  background: 'rgba(201,168,76,0.05)',
+                  background: 'var(--primary-faint)',
                   borderRadius: 8,
-                  borderLeft: '3px solid var(--gold)',
+                  borderLeft: '3px solid var(--primary)',
                   fontSize: 13,
                 }}>
                   {selectedContact.adminNote}
@@ -1200,13 +1237,16 @@ export default function AdminApp() {
                   padding: '10px 16px',
                   borderRadius: 8,
                   background: 'rgba(59,130,246,0.1)',
-                  border: '1px solid rgba(59,130,246,0.2)',
-                  color: '#60A5FA',
+                  border: '1px solid rgba(59,130,246,0.25)',
+                  color: '#2563EB',
                   cursor: 'pointer',
                   fontSize: 13,
+                  fontWeight: 600,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 }}
               >
-                ✏️ Update Status
+                <ICON d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" size={15} />
+                Update Status
               </button>
               <button
                 onClick={() => handleDeleteContact(selectedContact._id)}
@@ -1214,13 +1254,16 @@ export default function AdminApp() {
                   padding: '10px 16px',
                   borderRadius: 8,
                   background: 'rgba(248,113,113,0.1)',
-                  border: '1px solid rgba(248,113,113,0.2)',
+                  border: '1px solid rgba(248,113,113,0.25)',
                   color: 'var(--red)',
                   cursor: 'pointer',
                   fontSize: 13,
+                  fontWeight: 600,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 }}
               >
-                🗑 Delete
+                <ICON d="M3 6h18M8 6V4h8v2m-9 0v14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6" size={15} />
+                Delete
               </button>
               <button
                 onClick={() => { setShowContactDetail(false); setSelectedContact(null); }}
@@ -1245,7 +1288,7 @@ export default function AdminApp() {
       {showStatusModal && selectedContact && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1001,
-          background: 'rgba(5,7,9,0.85)',
+          background: 'rgba(17,24,39,0.55)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 20,
         }}>
@@ -1300,12 +1343,20 @@ export default function AdminApp() {
       {activeStageAction && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'rgba(5,7,9,0.85)',
+          background: 'rgba(17,24,39,0.55)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
         }}>
           <div className="card" style={{ maxWidth: 440, width: '100%', padding: '32px' }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>{activeStageAction.action === 'approve' ? '✅' : '❌'}</div>
+              <div className="icon-tile" style={{
+                width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px',
+                background: activeStageAction.action === 'approve' ? 'var(--green-light)' : 'var(--red-light)',
+                color: activeStageAction.action === 'approve' ? 'var(--green-dark)' : 'var(--red)',
+              }}>
+                {activeStageAction.action === 'approve'
+                  ? <ICON d="M20 6 9 17l-5-5" size={26} />
+                  : <ICON d="M18 6 6 18M6 6l12 12" size={26} />}
+              </div>
               <h3 style={{ fontSize: 22, marginBottom: 8 }}>
                 {activeStageAction.action === 'approve' ? 'Approve Stage' : 'Reject Stage'}
               </h3>
